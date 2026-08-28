@@ -25,6 +25,7 @@ try { var _s = JSON.parse(localStorage.getItem('kinen_v1')); if (_s && _s.theme)
 <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
+<a href="#main" class="skip-link" data-i18n="aria.skipToContent">本文へスキップ</a>
 <div id="app">
   <header class="app-header">
     <h1 data-i18n="app.title">🌱 禁煙トラッカー</h1>
@@ -345,7 +346,7 @@ try { var _s = JSON.parse(localStorage.getItem('kinen_v1')); if (_s && _s.theme)
 
     <p class="sec-title" data-i18n="set.basic">基本</p>
     <label class="field"><span data-i18n="set.startDate">禁煙を始めた日</span><input type="date" id="startDate" /></label>
-    <label class="field"><span data-i18n="set.goalDays">目標日数（日）</span><input type="number" id="goalDays" min="1" step="1" value="30" /></label>
+    <label class="field"><span data-i18n="set.goalDays">目標日数（日）</span><input type="number" id="goalDays" min="1" step="1" value="30" max="3650" /></label>
 
     <p class="sec-title" data-i18n="set.habit">喫煙習慣（節約の計算に使用）</p>
     <label class="field"><span data-i18n="set.currency">通貨</span>
@@ -358,13 +359,13 @@ try { var _s = JSON.parse(localStorage.getItem('kinen_v1')); if (_s && _s.theme)
       </select>
     </label>
     <p class="hint hint-warn" id="currencyWarn" hidden data-i18n="set.currencyWarn">⚠️ 通貨を変えたら、下の「1本あたりの金額」と「ごほうびの金額」も新しい通貨の数字で入力し直してください（自動では両替されません）</p>
-    <label class="field"><span data-i18n="set.cigsPerDay">1日あたりの平均喫煙本数（本）</span><input type="number" id="cigsPerDay" min="0" step="1" value="20" /></label>
-    <label class="field"><span data-i18n="set.pricePerCig">1本あたりの金額</span><input type="number" id="pricePerCig" min="0" step="1" value="30" /></label>
-    <label class="field"><span data-i18n="set.tarPerCig">1本あたりのタール量（mg）</span><input type="number" id="tarPerCig" min="0" step="1" value="10" /></label>
+    <label class="field"><span data-i18n="set.cigsPerDay">1日あたりの平均喫煙本数（本）</span><input type="number" id="cigsPerDay" min="0" step="1" value="20" max="99" /></label>
+    <label class="field"><span data-i18n="set.pricePerCig">1本あたりの金額</span><input type="number" id="pricePerCig" min="0" step="1" value="30" max="1000000" /></label>
+    <label class="field"><span data-i18n="set.tarPerCig">1本あたりのタール量（mg）</span><input type="number" id="tarPerCig" min="0" step="1" value="10" max="10000" /></label>
 
     <p class="sec-title" data-i18n="set.reward">ごほうび（任意）</p>
     <label class="field"><span data-i18n="set.rewardName">節約したお金で欲しいもの</span><input type="text" id="rewardName" data-i18n-ph="set.rewardNamePh" placeholder="例: 新しいイヤホン" maxlength="30" /></label>
-    <label class="field"><span data-i18n="set.rewardPrice">その金額</span><input type="number" id="rewardPrice" min="0" step="1" data-i18n-ph="set.rewardPricePh" placeholder="例: 15000" /></label>
+    <label class="field"><span data-i18n="set.rewardPrice">その金額</span><input type="number" id="rewardPrice" min="0" step="1" data-i18n-ph="set.rewardPricePh" placeholder="例: 15000" max="100000000" /></label>
     <p class="hint" data-i18n="set.rewardHint">設定するとホームに「ごほうび貯金」の進み具合が表示されます。</p>
 
     <p class="sec-title" data-i18n="set.you">あなた</p>
@@ -457,8 +458,8 @@ try { var _s = JSON.parse(localStorage.getItem('kinen_v1')); if (_s && _s.theme)
       <h2 data-i18n="ob.habit">これまでの喫煙習慣</h2>
       <p class="ob-lead" data-i18n="ob.lead2">節約できた金額の計算に使います。
 だいたいで大丈夫です。</p>
-      <label class="field"><span data-i18n="set.cigsPerDay">1日あたりの平均喫煙本数（本）</span><input type="number" id="obCigs" min="0" step="1" value="20" /></label>
-      <label class="field"><span data-i18n="set.pricePerCig">1本あたりの金額</span><input type="number" id="obPrice" min="0" step="1" value="30" /></label>
+      <label class="field"><span data-i18n="set.cigsPerDay">1日あたりの平均喫煙本数（本）</span><input type="number" id="obCigs" min="0" step="1" value="20" max="99" /></label>
+      <label class="field"><span data-i18n="set.pricePerCig">1本あたりの金額</span><input type="number" id="obPrice" min="0" step="1" value="30" max="1000000" /></label>
       <div class="sheet-actions">
         <button id="obNext2" class="btn btn-primary" data-i18n="ob.next">次へ</button>
         <button id="obBack2" class="btn" data-i18n="ob.back">戻る</button>
@@ -469,7 +470,7 @@ try { var _s = JSON.parse(localStorage.getItem('kinen_v1')); if (_s && _s.theme)
       <h2 data-i18n="ob.goalTitle">最初の目標</h2>
       <p class="ob-lead" data-i18n="ob.lead3">まずは無理のない目標から。
 達成したらいつでも延長できます。</p>
-      <label class="field"><span data-i18n="ob.goalDays">目標日数</span><input type="number" id="obGoal" min="1" step="1" value="30" /></label>
+      <label class="field"><span data-i18n="ob.goalDays">目標日数</span><input type="number" id="obGoal" min="1" step="1" value="30" max="3650" /></label>
       <label class="field"><span data-i18n="ob.birth">生年月日（任意・占いとアドバイスに使用）</span><input type="date" id="obBirth" /></label>
       <div class="sheet-actions">
         <button id="obFinish" class="btn btn-primary" data-i18n="ob.finish">はじめる 🎉</button>

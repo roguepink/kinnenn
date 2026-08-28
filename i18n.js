@@ -10,6 +10,7 @@ window.I18N = (() => {
     'app.title': '🌱 禁煙トラッカー',
     'aria.settings': '設定を開く',
     'aria.close': '閉じる',
+    'aria.skipToContent': '本文へスキップ',
 
     'greet.name': '{name}さん、',
     'greet.morning': 'おはようございます ☀️',
@@ -270,6 +271,7 @@ window.I18N = (() => {
     'app.title': '🌱 Smoke-Free Tracker',
     'aria.settings': 'Open settings',
     'aria.close': 'Close',
+    'aria.skipToContent': 'Skip to content',
 
     'greet.name': '{name}, ',
     'greet.morning': 'Good morning ☀️',

@@ -350,6 +350,16 @@ function check(name, cond) {
   await pageEn.waitForTimeout(900);
   check('EN新規: 節約$80表示', (await pageEn.textContent('#moneySaved')) === '$80');
   check('EN新規: html=en', (await pageEn.evaluate(() => document.documentElement.lang)) === 'en');
+  /* 日本語ブロックと英語ブロックを取り違えると、英語環境で日本語の窓口案内が
+     出てしまう。ここで両方向を止める。 */
+  check('EN: 相談窓口も英語', /Where to get help/.test(await pageEn.textContent('.help-card')));
+  await pageEn.click('#openHelp');
+  await pageEn.waitForTimeout(300);
+  const helpEn = await pageEn.textContent('#helpSheet');
+  check('EN: 窓口の中身も英語', /24 hours/.test(helpEn) && !/受付時間/.test(helpEn));
+  check('EN: 電話番号は日本のまま', /0120-279-338/.test(helpEn));
+  await pageEn.click('#closeHelp');
+  await pageEn.waitForTimeout(200);
   await pageEn.close();
 
   // ── 11. タロット78枚デッキ＋大吉ジャックポット ──
@@ -622,6 +632,39 @@ function check(name, cond) {
     (await page.evaluate(() => JSON.parse(localStorage.getItem('kinen_v1')).reminderTime)) === '20:30');
   await page.click('#closeSettings');
   await page.waitForTimeout(300);
+
+  // ── 相談窓口: 掲載内容が消えない／受付時間と通話料が必ず書いてある ──
+  /* 番号そのものは 2026-08 に確認済み。ここで守りたいのは「掛けたのに出ない」を
+     防ぐ書き方（24時間でない窓口の受付時間、ナビダイヤルの通話料）が
+     あとから削られないこと。 */
+  await page.click('.nav-item[data-tab="home"]');
+  await page.waitForTimeout(200);
+  await page.click('#openHelp');
+  await page.waitForTimeout(300);
+  check('相談窓口シートが開く', !(await page.$eval('#helpSheet', el => el.classList.contains('hidden'))));
+  const helpText = await page.textContent('#helpSheet');
+  check('危機時の案内が最初に出ている', /死にたい/.test(await page.textContent('.help-urgent')));
+  check('24時間の窓口に直接かけられる',
+    (await page.getAttribute('#helpUrgentTel a', 'href')) === 'tel:0120279338');
+  check('窓口が種類ごとに分けられている', (await page.$$('#helpList .help-group')).length === 3);
+  check('各窓口にも発信ボタンがある', (await page.$$('#helpList .help-tel')).length === 3);
+  check('確認日が明記されている', /2026年8月に確認/.test(helpText));
+  check('有料の番号は通話料を明示している', /通話料は自己負担/.test(helpText));
+  check('保険が使える禁煙外来が案内されている',
+    /禁煙外来/.test(helpText) && /健康保険/.test(helpText));
+  check('保険の適用条件が具体的に書いてある',
+    /TDS/.test(helpText) && /200以上/.test(helpText));
+  check('無料の電話相談が案内されている', /きんえん電話相談室/.test(helpText));
+  check('電話相談に受付時間が書いてある', /10:00〜16:00/.test(helpText));
+  /* 外部サイトへ飛ぶとき、どのアプリから来たかを相手に渡さない。 */
+  const helpLinks = await page.$$eval('#helpList .help-link',
+    els => els.map(e => ({ rel: e.getAttribute('rel'), target: e.getAttribute('target') })));
+  check('外部リンクがある', helpLinks.length === 2);
+  check('外部リンクは参照元を渡さない', helpLinks.every(l => /noreferrer/.test(l.rel || '')));
+  check('外部リンクは別タブで開く', helpLinks.every(l => l.target === '_blank'));
+  await page.click('#closeHelp');
+  await page.waitForTimeout(300);
+  check('相談窓口シートが閉じる', await page.$eval('#helpSheet', el => el.classList.contains('hidden')));
 
   // ── 15b. sticky指定のトースト(アプリ更新通知など)は自動で消えない ──
   await page.evaluate(() => window.toast('スティッキーテスト', { label: 'ボタン', fn: () => {} }, { sticky: true }));

@@ -1,7 +1,7 @@
 /* 禁煙トラッカー Service Worker
    - ページ(HTML)はネットワーク優先: 更新が確実にユーザーに届く
    - アセットはキャッシュ優先＋裏で更新(stale-while-revalidate) */
-const CACHE = 'kinen-1d9618808a';
+const CACHE = 'kinen-0dc2731ddd';
 const ASSETS = [
   './',
   './index.html',

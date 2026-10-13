@@ -241,6 +241,35 @@ function check(name, cond) {
   await page.waitForTimeout(500);
   check('別の日スリップundo後: 連続10日', (await page.textContent('#chipStreak b')) === '10');
 
+  // ── 7f-2. 「別の日」を押しただけで今日が記録されてしまわないこと ──
+  //    以前は「別の日」を押した時点で日付欄に今日が入っていたため、日付ピッカーを
+  //    開いて閉じただけの人が、別の日を選んだつもりのまま今日として記録されていた。
+  await page.click('.nav-item[data-tab="home"]');
+  await page.click('#relapseBtn');
+  await page.waitForTimeout(250);
+  await page.click('#relapseDaySeg .seg-btn[data-day="other"]');
+  await page.waitForTimeout(150);
+  check('別の日: 日付欄に今日が勝手に入らない', (await page.inputValue('#relapseDate')) === '');
+  await page.click('#saveRelapseBtn');
+  await page.waitForTimeout(500);
+  check('日付を選ばないと保存されない（シートは開いたまま）',
+    !(await page.$eval('#relapseSheet', el => el.classList.contains('hidden'))));
+  check('日付を選ばないまま今日が記録されない', (await page.textContent('#chipStreak b')) === '10');
+  const day2ago = new Date(Date.now() - 2 * 86400000).toISOString().slice(0, 10);
+  await page.fill('#relapseDate', day2ago);
+  await page.waitForTimeout(200);
+  /* 保存する前に「どの日として記録されるか」が本人に見えているか */
+  check('保存前に記録される日が文字で見える',
+    (await page.textContent('#relapseDatePreview')).includes(`${Number(day2ago.slice(8, 10))}日`));
+  await page.click('#saveRelapseBtn');
+  await page.waitForTimeout(600);
+  /* 2日前に付けば連続1日（昨日・今日は無事）。今日に付いてしまうと0日になる */
+  check('2日前を選んだら2日前に記録される（連続1日）', (await page.textContent('#chipStreak b')) === '1');
+  await page.click('#rcUndo');
+  await page.waitForTimeout(500);
+  check('取り消しで連続10日に戻る', (await page.textContent('#chipStreak b')) === '10');
+
+
   // ── 7g. スリップ確認カードの✕ボタン → undoせず記録は残る ──
   await page.click('#relapseBtn');
   await page.waitForTimeout(250);
